@@ -38,7 +38,7 @@ function drawBoxes(){
     let boxWidth = window.innerWidth/5;
 
     ctx.fillStyle = '#aeae93';
-    ctx.font = "20px Arial";
+    ctx.font = "19px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     padding = 2;
@@ -47,10 +47,10 @@ function drawBoxes(){
         let x = onePercentX*xPos;
         let y = offsetY[i];
 
-        ctx.fillStyle = '#aeae93';
+        ctx.fillStyle = 'white';
         ctx.fillRect(x, y, boxWidth, boxHeight);
         
-        ctx.fillStyle = 'white';        
+        ctx.fillStyle = 'black';        
         ctx.fillText(textElements[i], x + boxWidth / 2 +  padding, y + padding + boxHeight/ 2);
         xPos += xOffset;
     }
@@ -58,22 +58,21 @@ function drawBoxes(){
 
 function spinBoxes(){
     for (i = 0; i < 5; i++){ 
-        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight * 7.5, onComplete: drawStars });
-        offsetY[i] = tweenElement[i].y > (window.innerHeight*Math.floor(tweenElement[i].y/window.innerHeight)) ? 
-            tweenElement[i].y - (window.innerHeight*Math.floor(tweenElement[i].y/window.innerHeight)) : tweenElement[i].y
-    }
+        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight * 13.5, onComplete: drawStars });
+        offsetY[i] = tweenElement[i].y - (window.innerHeight * Math.floor(tweenElement[i].y/window.innerHeight))
+    }  
     
 
 }
 
 function drawStars(){
-    console.log("go")
+    //console.log("go")
 }
 
 var reset = false;
 var textElements = ['Amir', 'Begic', 'Starcraft', 'Warhammer', 'Civilization'];
 var initialOffset = 0;
-var tweenDuration = [3, 4, 5.4, 5, 3.6];
+var tweenDuration = [2, 3, 3.35, 3.3, 2.6];
 var offsetY = [initialOffset, initialOffset, initialOffset, initialOffset, initialOffset];
 var offsetYtween = {y: 0};
 var tweenElement = [{y:0},{y:0},{y:0},{y:0},{y:0}];
