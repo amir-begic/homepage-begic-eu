@@ -78,12 +78,15 @@ function drawStars(time){
 
 function positionStars(radiant){
     var radius = window.innerHeight *0.4;
+    var yOffset = 30;
     if (window.innerHeight > window.innerWidth){
-        radius = window.innerHeight * 0.1;
+        radius = window.innerHeight * 0.2;
+        yOffset= 0;
+
     }
     var x = Math.cos(radiant/180*Math.PI ) * radius;
     var y = Math.sin(radiant/180*Math.PI ) * radius;
-    ctx.drawImage(imgStar, window.innerWidth / 2 + x - 30, window.innerHeight / 2 + y -30, 60, 60);
+    ctx.drawImage(imgStar, window.innerWidth / 2 + x - 30, window.innerHeight / 2 + y - yOffset, 60, 60);
     
 }
 
@@ -94,7 +97,7 @@ var time = 0;
 var radiants = [0,30,60,90,120,150,180,210,240,270,300,330];
 var textElements = ['Amir', 'Begic', 'LTT', 'Store', '.Com'];
 var initialOffset = 0;
-var tweenDuration = [2, 3, 3.35, 3.3, 2.6];
+var tweenDuration = [2, 2.3, 2.45, 2.43, 2.4];
 var offsetY = [initialOffset, initialOffset, initialOffset, initialOffset, initialOffset];
 var offsetYtween = {y: 0};
 var tweenElement = [{y:0},{y:0},{y:0},{y:0},{y:0}];
