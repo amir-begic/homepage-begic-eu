@@ -82,6 +82,9 @@ function drawStars(t){
 
 function positionStars(radiant){
     var radius = window.innerHeight *0.4;
+    if (window.innerHeight > window.innerWidth){
+        radius = window.innerHeight * 0.1;
+    }
     var x = Math.cos(radiant/180*Math.PI ) * radius;
     var y = Math.sin(radiant/180*Math.PI ) * radius;
     ctx.drawImage(imgStar, window.innerWidth / 2 + x - 30, window.innerHeight / 2 + y -30, 60, 60);
