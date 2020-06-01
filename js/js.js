@@ -2,9 +2,9 @@ function draw() {
     
     ctx.fillStyle = '#004494';
     ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    t += 0.5;
+    time += 0.5;
     drawLines();
-    drawStars(t);
+    drawStars(time);
     drawBoxes();
     spinBoxes();
     requestAnimationFrame(draw);
@@ -72,12 +72,8 @@ function spinBoxes(){
     }  
 }
 
-function drawStars(t){
-    // var x = Math.cos(pointAngleInRadians) * radius;
-    // var y = Math.sin(pointAngleInRadians) * radius;
-    radiants.forEach(radiant => positionStars(radiant+t));
-
-
+function drawStars(time){
+    radiants.forEach(radiant => positionStars(radiant + time));
 }
 
 function positionStars(radiant){
@@ -94,7 +90,7 @@ function positionStars(radiant){
 const imgStar = new Image(50,50);
 imgStar.src = 'assets/star.png'
 
-var t = 0;
+var time = 0;
 var radiants = [0,30,60,90,120,150,180,210,240,270,300,330];
 var textElements = ['Amir', 'Begic', 'LTT', 'Store', '.Com'];
 var initialOffset = 0;
