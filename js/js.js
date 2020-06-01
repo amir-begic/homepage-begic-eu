@@ -1,13 +1,13 @@
 function draw() {
     
-    requestAnimationFrame(draw)
     ctx.fillStyle = '#004494';
-    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight); 
-
-    drawBoxes()
-    drawLines()
-    spinBoxes()
-
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    t += 0.5;
+    drawLines();
+    drawStars(t);
+    drawBoxes();
+    spinBoxes();
+    requestAnimationFrame(draw);
 }
 
 function drawLines(){
@@ -25,9 +25,17 @@ function drawLines(){
         ctx.lineTo(onePercentX * linepositionX, window.innerHeight);
         linepositionX += linedistanceX;
     }
-    ctx.stroke();
-}
 
+    ctx.stroke();
+
+    // for(i = 0; i>11; i++){
+    //     drawStarsInACircle()
+    // }
+
+    // ctx.drawImage(imgStar, onePercentX*45 - 30, window.innerHeight/100*22 -30, 60, 60);
+    // ctx.drawImage(imgStar, onePercentX*50 - 30, window.innerHeight/100*20 -30, 60, 60);
+
+}
 
 function drawBoxes(){
     let onePercentX = window.innerWidth/100;
@@ -51,26 +59,41 @@ function drawBoxes(){
         ctx.fillRect(x, y, boxWidth, boxHeight);
         
         ctx.fillStyle = 'black';        
-        ctx.fillText(textElements[i], x + boxWidth / 2 +  padding, y + padding + boxHeight/ 2);
+        ctx.fillText(textElements[i], x + boxWidth / 2 +  padding, y + padding + boxHeight / 2);
         xPos += xOffset;
     }
 }
 
 function spinBoxes(){
-    for (i = 0; i < 5; i++){ 
-        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight * 13.5, onComplete: drawStars });
-        offsetY[i] = tweenElement[i].y - (window.innerHeight * Math.floor(tweenElement[i].y/window.innerHeight))
+    for (i = 0; i < textElements.length; i++){ 
+        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight *10.5, onComplete: drawStars });
+        //TODO: Add Custom tween, last couple of values linger too long
+        offsetY[i] = tweenElement[i].y - (window.innerHeight * Math.floor(tweenElement[i].y/window.innerHeight));
     }  
+}
+
+function drawStars(t){
+    // var x = Math.cos(pointAngleInRadians) * radius;
+    // var y = Math.sin(pointAngleInRadians) * radius;
+    radiants.forEach(radiant => positionStars(radiant+t));
+
+
+}
+
+function positionStars(radiant){
+    var radius = window.innerHeight *0.4;
+    var x = Math.cos(radiant/180*Math.PI ) * radius;
+    var y = Math.sin(radiant/180*Math.PI ) * radius;
+    ctx.drawImage(imgStar, window.innerWidth / 2 + x - 30, window.innerHeight / 2 + y -30, 60, 60);
     
-
 }
 
-function drawStars(){
-    //console.log("go")
-}
+const imgStar = new Image(50,50);
+imgStar.src = 'assets/star.png'
 
-var reset = false;
-var textElements = ['Amir', 'Begic', 'Starcraft', 'Warhammer', 'Civilization'];
+var t = 0;
+var radiants = [0,30,60,90,120,150,180,210,240,270,300,330];
+var textElements = ['Amir', 'Begic', 'LTT', 'Store', '.Com'];
 var initialOffset = 0;
 var tweenDuration = [2, 3, 3.35, 3.3, 2.6];
 var offsetY = [initialOffset, initialOffset, initialOffset, initialOffset, initialOffset];
@@ -85,8 +108,9 @@ canvas.style.height = window.innerHeight;
 if (canvas.getContext) {
     var ctx = canvas.getContext('2d');
 }
+
 draw()
-  
+
 window.addEventListener('resize', ()=>{
     canvas.style.width = window.innerWidth;
     canvas.width= window.innerWidth;
