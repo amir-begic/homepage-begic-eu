@@ -2,15 +2,24 @@ function draw() {
     
     ctx.fillStyle = '#004494';
     ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    //timeOffset = timeOffset > 0.5 ? timeOffset -= 0.2 : timeOffset += 0.2
-    if(timeOffset>0.5)
-    {
-        timeOffset -= 0.1
+
+    if(scrollClockwise){
+        if(timeOffset > 0.5 )
+        {
+            timeOffset -= 0.2
+        }else{
+            timeOffset += 0.2
+        }
     }else{
-        timeOffset +=0.1
+        if(timeOffset < -0.5)
+        {
+            timeOffset += 0.2
+        }else{
+            timeOffset -= 0.2
+        }
     }
-    
     time += timeOffset;
+
     drawLines();
     drawStars(time);
     drawBoxes();
@@ -93,6 +102,7 @@ function positionStars(radiant){
 const imgStar = new Image(50,50);
 imgStar.src = 'assets/star.png'
 
+var scrollClockwise = true;
 var time = 0;
 var timeOffset = 0.5
 var radiants = [0,30,60,90,120,150,180,210,240,270,300,330];
@@ -122,9 +132,12 @@ window.addEventListener('resize', ()=>{
 })
 
 window.addEventListener('wheel', (event)=>{
+
     if(event.deltaY < 0 && timeOffset > -10){
-        timeOffset -= 1.25;
+        timeOffset -= 1.25;        
     }else if (event.deltaY > 0 && timeOffset < 10){
         timeOffset += 1.25;
     }
+
+    scrollClockwise = timeOffset > 0;
 })
