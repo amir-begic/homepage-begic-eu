@@ -2,7 +2,7 @@ function draw() {
     
     ctx.fillStyle = '#004494';
     ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    time += 0.5;
+    time += timeOffset;
     drawLines();
     drawStars(time);
     drawBoxes();
@@ -27,14 +27,6 @@ function drawLines(){
     }
 
     ctx.stroke();
-
-    // for(i = 0; i>11; i++){
-    //     drawStarsInACircle()
-    // }
-
-    // ctx.drawImage(imgStar, onePercentX*45 - 30, window.innerHeight/100*22 -30, 60, 60);
-    // ctx.drawImage(imgStar, onePercentX*50 - 30, window.innerHeight/100*20 -30, 60, 60);
-
 }
 
 function drawBoxes(){
@@ -66,8 +58,9 @@ function drawBoxes(){
 
 function spinBoxes(){
     for (i = 0; i < textElements.length; i++){ 
-        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight *10.5, onComplete: drawStars });
+        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight *10.5, onComplete: drawStars})
         //TODO: Add Custom tween, last couple of values linger too long
+        //CustomEase.create("custom", "M0,0,C0.126,0.382,0.728,1,0.98,1,1.168,1,0.818,1.001,1,1"), });
         offsetY[i] = tweenElement[i].y - (window.innerHeight * Math.floor(tweenElement[i].y/window.innerHeight));
     }  
 }
@@ -94,8 +87,9 @@ const imgStar = new Image(50,50);
 imgStar.src = 'assets/star.png'
 
 var time = 0;
+var timeOffset = 0.5
 var radiants = [0,30,60,90,120,150,180,210,240,270,300,330];
-var textElements = ['Amir', 'Begic', 'LTT', 'Store', '.Com'];
+var textElements = ['Amir', 'Begic', 'Tab1', 'Tab2', 'Tab3'];
 var initialOffset = 0;
 var tweenDuration = [2, 2.3, 2.45, 2.43, 2.4];
 var offsetY = [initialOffset, initialOffset, initialOffset, initialOffset, initialOffset];
@@ -118,4 +112,12 @@ window.addEventListener('resize', ()=>{
     canvas.width= window.innerWidth;
     canvas.height= window.innerHeight;
     canvas.style.height = window.innerHeight;
+})
+
+window.addEventListener('wheel', (event)=>{
+    if(event.deltaY < 0){
+        timeOffset -= 0.25;
+    }else{
+        timeOffset += 0.25;
+    }
 })
