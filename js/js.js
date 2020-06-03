@@ -18,6 +18,7 @@ function draw() {
             timeOffset -= 0.2
         }
     }
+
     time += timeOffset;
 
     drawLines();
@@ -97,7 +98,8 @@ function positionStars(radiant){
     }
     var x = Math.cos(radiant/180*Math.PI ) * radius;
     var y = Math.sin(radiant/180*Math.PI ) * radius;
-    ctx.drawImage(imgStar, window.innerWidth / 2 + x - imageSize/2, window.innerHeight / 2 + y - yOffset, imageSize, imageSize);
+    ctx.drawImage(imgStar, window.innerWidth / 2 + x - imageSize / 2, window.innerHeight / 2 + y - yOffset, 
+        imageSize, imageSize);
     
 }
 
@@ -142,4 +144,12 @@ window.addEventListener('wheel', (event)=>{
     }
 
     scrollClockwise = timeOffset > 0;
-})
+});
+
+window.addEventListener("deviceorientation", (event)=>{
+    if(event.beta < 0 && timeOffset > -10){
+        timeOffset -= 1.5;        
+    }else if (event.beta > 0 && timeOffset < 10){
+        timeOffset += 1.5;
+    }
+});
