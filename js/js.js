@@ -152,4 +152,6 @@ window.addEventListener("deviceorientation", (event)=>{
     }else if (event.beta > 0 && timeOffset < 10){
         timeOffset += 1.5;
     }
+console.log(event.beta)
+
 });
