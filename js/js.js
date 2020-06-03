@@ -2,6 +2,14 @@ function draw() {
     
     ctx.fillStyle = '#004494';
     ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    //timeOffset = timeOffset > 0.5 ? timeOffset -= 0.2 : timeOffset += 0.2
+    if(timeOffset>0.5)
+    {
+        timeOffset -= 0.1
+    }else{
+        timeOffset +=0.1
+    }
+    
     time += timeOffset;
     drawLines();
     drawStars(time);
@@ -58,7 +66,7 @@ function drawBoxes(){
 
 function spinBoxes(){
     for (i = 0; i < textElements.length; i++){ 
-        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight *10.5, onComplete: drawStars})
+        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight *10.5})
         //TODO: Add Custom tween, last couple of values linger too long
         //CustomEase.create("custom", "M0,0,C0.126,0.382,0.728,1,0.98,1,1.168,1,0.818,1.001,1,1"), });
         offsetY[i] = tweenElement[i].y - (window.innerHeight * Math.floor(tweenElement[i].y/window.innerHeight));
@@ -75,7 +83,6 @@ function positionStars(radiant){
     if (window.innerHeight > window.innerWidth){
         radius = window.innerHeight * 0.2;
         yOffset= 0;
-
     }
     var x = Math.cos(radiant/180*Math.PI ) * radius;
     var y = Math.sin(radiant/180*Math.PI ) * radius;
@@ -115,9 +122,9 @@ window.addEventListener('resize', ()=>{
 })
 
 window.addEventListener('wheel', (event)=>{
-    if(event.deltaY < 0){
-        timeOffset -= 0.25;
-    }else{
-        timeOffset += 0.25;
+    if(event.deltaY < 0 && timeOffset > -10){
+        timeOffset -= 1.25;
+    }else if (event.deltaY > 0 && timeOffset < 10){
+        timeOffset += 1.25;
     }
 })
