@@ -89,13 +89,15 @@ function drawStars(time){
 function positionStars(radiant){
     var radius = window.innerHeight *0.4;
     var yOffset = 30;
+    var imageSize = 60;
     if (window.innerHeight > window.innerWidth){
         radius = window.innerHeight * 0.2;
         yOffset= 0;
+        imageSize = 30;
     }
     var x = Math.cos(radiant/180*Math.PI ) * radius;
     var y = Math.sin(radiant/180*Math.PI ) * radius;
-    ctx.drawImage(imgStar, window.innerWidth / 2 + x - 30, window.innerHeight / 2 + y - yOffset, 60, 60);
+    ctx.drawImage(imgStar, window.innerWidth / 2 + x - imageSize/2, window.innerHeight / 2 + y - yOffset, imageSize, imageSize);
     
 }
 
@@ -134,9 +136,9 @@ window.addEventListener('resize', ()=>{
 window.addEventListener('wheel', (event)=>{
 
     if(event.deltaY < 0 && timeOffset > -10){
-        timeOffset -= 1.25;        
+        timeOffset -= 1.5;        
     }else if (event.deltaY > 0 && timeOffset < 10){
-        timeOffset += 1.25;
+        timeOffset += 1.5;
     }
 
     scrollClockwise = timeOffset > 0;
