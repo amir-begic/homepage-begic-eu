@@ -63,7 +63,7 @@ function drawBoxes(){
 
     if (window.innerHeight > window.innerWidth){
         ctx.font = "14px Arial";        
-        padding = -1;
+        padding = 0;
     }
 
     for (i=0; i < boxCount;i++){
@@ -122,21 +122,24 @@ var offsetYtween = {y: 0};
 var tweenElement = [{y:0},{y:0},{y:0},{y:0},{y:0}];
 
 var canvas = document.querySelector('#canvas');
+var pr = window.devicePixelRatio;
 canvas.style.width = window.innerWidth;
-canvas.width= window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width= Math.floor(window.innerWidth * pr) ;
+canvas.height =Math.floor(window.innerHeight * pr);
 canvas.style.height = window.innerHeight;
+
 if (canvas.getContext) {
     var ctx = canvas.getContext('2d');
 }
-
+ctx.scale(pr, pr)
 draw()
 
 window.addEventListener('resize', ()=>{
     canvas.style.width = window.innerWidth;
-    canvas.width= window.innerWidth;
-    canvas.height= window.innerHeight;
+    canvas.width= Math.floor(window.innerWidth * pr) ;
+    canvas.height =Math.floor(window.innerHeight * pr);
     canvas.style.height = window.innerHeight;
+    ctx.scale(pr, pr)
 })
 
 window.addEventListener('wheel', (event)=>{
