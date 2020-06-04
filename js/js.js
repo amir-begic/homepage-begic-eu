@@ -63,17 +63,18 @@ function drawBoxes(){
 
     if (window.innerHeight > window.innerWidth){
         ctx.font = "14px Arial";
+        padding = 0;
     }
 
     for (i=0; i < boxCount;i++){
         let x = onePercentX*xPos;
         let y = offsetY[i];
-
+        textElements[4] = moment().format('LTS');
         ctx.fillStyle = 'white';
         ctx.fillRect(x, y, boxWidth, boxHeight);
         
         ctx.fillStyle = 'black';        
-        ctx.fillText(textElements[i], x + boxWidth / 2 +  padding, y + padding + boxHeight / 2);
+        ctx.fillText(textElements[i], x + boxWidth / 2 +  padding, y  + boxHeight / 2 + padding);
         xPos += xOffset;
     }
 }
@@ -113,7 +114,7 @@ var scrollClockwise = true;
 var time = 0;
 var timeOffset = 0.5
 var radiants = [0,30,60,90,120,150,180,210,240,270,300,330];
-var textElements = ['Amir', 'Begic', 'WebDev', 'Student', "2020 "+String.fromCharCode(169)];
+var textElements = ['Amir', 'Begic', 'WebDev', 'Student', String.fromCharCode(169)+"2020"];
 var initialOffset = 0;
 var tweenDuration = [2, 2.3, 2.45, 2.43, 2.4];
 var offsetY = [initialOffset, initialOffset, initialOffset, initialOffset, initialOffset];
