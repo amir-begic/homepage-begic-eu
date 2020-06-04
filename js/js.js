@@ -62,8 +62,8 @@ function drawBoxes(){
     padding = 2;
 
     if (window.innerHeight > window.innerWidth){
-        ctx.font = "14px Arial";
-        padding = 0;
+        ctx.font = "14px Arial";        
+        padding = 1;
     }
 
     for (i=0; i < boxCount;i++){
