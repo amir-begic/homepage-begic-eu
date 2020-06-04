@@ -69,7 +69,7 @@ function drawBoxes(){
     for (i=0; i < boxCount;i++){
         let x = onePercentX*xPos;
         let y = offsetY[i];
-        textElements[4] = moment().format('LTS');
+        textElements[4] = moment().format('HH:mm:ss');
         ctx.fillStyle = 'white';
         ctx.fillRect(x, y, boxWidth, boxHeight);
         
