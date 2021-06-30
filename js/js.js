@@ -56,17 +56,17 @@ function drawBoxes(){
     let boxWidth = window.innerWidth/5;
 
     ctx.fillStyle = '#aeae93';
-    ctx.font = "28px Arial";
+    ctx.font = "28px eurocine-regular";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     padding = 2;
 
     if (window.innerHeight > window.innerWidth){
-        ctx.font = "14px Arial";        
+        ctx.font = "14px eurocine-regular";        
         padding = 0;
     }
 
-    for (i=0; i < boxCount;i++){
+    for (i=0; i < boxCount;i++){            
         let x = onePercentX*xPos;
         let y = offsetY[i];
         textElements[4] = moment().format('HH:mm:ss');
@@ -114,14 +114,17 @@ var scrollClockwise = true;
 var time = 0;
 var timeOffset = 0.5
 var radiants = [0,30,60,90,120,150,180,210,240,270,300,330];
-var textElements = ['Amir', 'Begic', 'WebDev', 'Student', String.fromCharCode(169)+"2020"];
+var textElements = ['Amir', 'Begic', 'Projects', 'Photography', String.fromCharCode(169)+"2021"];
+var clickedElements = [false, false, false, false, false]
 var initialOffset = 0;
-var tweenDuration = [2, 2.3, 2.45, 2.43, 2.4];
+var tweenDuration = [3, 3.8, 4, 3.6, 3.2];
 var offsetY = [initialOffset, initialOffset, initialOffset, initialOffset, initialOffset];
 var offsetYtween = {y: 0};
 var tweenElement = [{y:0},{y:0},{y:0},{y:0},{y:0}];
 
 var canvas = document.querySelector('#canvas');
+var main = document.querySelector('#main');
+var spinbutton = document.querySelector('#spinbutton')
 var pr = window.devicePixelRatio;
 canvas.style.width = window.innerWidth;
 canvas.width= Math.floor(window.innerWidth * pr) ;
@@ -136,10 +139,15 @@ draw()
 
 window.addEventListener('resize', ()=>{
     canvas.style.width = window.innerWidth;
-    canvas.width= Math.floor(window.innerWidth * pr) ;
+    canvas.width= Math.floor(window.innerWidth * pr);
     canvas.height =Math.floor(window.innerHeight * pr);
     canvas.style.height = window.innerHeight;
-    ctx.scale(pr, pr)
+    ctx.scale(pr, pr);
+})
+
+spinbutton.addEventListener('click', (event)=> {
+    tweenElement = [{y:0},{y:0},{y:0},{y:0},{y:0}];
+    spinBoxes();
 })
 
 window.addEventListener('wheel', (event)=>{
@@ -149,6 +157,5 @@ window.addEventListener('wheel', (event)=>{
     }else if (event.deltaY > 0 && timeOffset < 10){
         timeOffset += 1.5;
     }
-
     scrollClockwise = timeOffset > 0;
 });
