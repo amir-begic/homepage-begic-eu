@@ -54,13 +54,13 @@ function drawBoxes(){
     let xOffset = 100 / boxCount;
 
     ctx.fillStyle = '#aeae93';
-    ctx.font = "1.75rem eurocine-regular";
+    ctx.font = "28px eurocine-regular";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     padding = 2;
 
     if (window.innerHeight > window.innerWidth){
-        ctx.font = "0.625rem eurocine-regular";        
+        ctx.font = "10px eurocine-regular";        
         padding = 0;
     }
 
