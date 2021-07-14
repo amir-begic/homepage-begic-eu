@@ -8,6 +8,7 @@ body{margin: 0;
     font-family: 'eurocine-regular', Arial, sans-serif; 
     font-weight: normal;
     font-style: normal;
+    font-size: 1rem;
 }
 .mailto{
     display: inline-block;
@@ -20,6 +21,7 @@ body{margin: 0;
     display: flex;
 }
 .buttontext{
+    font-size: 1.25rem;
     position: relative;
     text-decoration: none;
     color: black;
@@ -27,28 +29,38 @@ body{margin: 0;
 }
 .spinbutton {
     position: absolute;
-    bottom: 5px;
-    right: 5px;
-    padding: 0.5rem 1rem;
-    border: 2px solid black;
+    top: 12px;
+    right: 12px;
+    padding: 0rem 2rem;
+    border: 2px;
     background-color: white;
-    border-radius: 10px;
     display: inline-block;
-    margin: 0 10px 10px 0;
+    margin: 0 0px 0px 0;
     text-decoration: none;
 }
 .spinbutton:after {
     content: '';
     background: #FDCB0B;
-    position:absolute;
+    position: absolute;
     width:0%;
     top:0;
     left:0;
     height:100%;
-    border-radius: 10px;
     transition: 0.3s linear;
 }
 .spinbutton:hover:after {
     width:100%;
     z-index: 1;
+}
+
+@media only screen and (max-width: 768px) {
+    .spinbutton {
+        top : 8px;
+        right: 8px;
+        padding: 0.1rem 1rem;
+        border: 1px solid black;
+        }
+    .buttontext{
+        font-size: 0.5rem;
+    }
 }

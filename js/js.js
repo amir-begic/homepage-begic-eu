@@ -25,6 +25,7 @@ function draw() {
     drawStars(time);
     drawBoxes();
     spinBoxes();
+    drawWhiteOverlay();
     requestAnimationFrame(draw);
 }
 
@@ -38,7 +39,7 @@ function drawLines(){
     ctx.lineWidth = "2";
     ctx.strokeStyle = "white";
 
-    for (i = 0; i < sectionCount ;i++){
+    for (i = 1; i < sectionCount; i++){
         ctx.moveTo(onePercentX * linepositionX, 0);
         ctx.lineTo(onePercentX * linepositionX, window.innerHeight);
         linepositionX += linedistanceX;
@@ -49,40 +50,40 @@ function drawLines(){
 
 function drawBoxes(){
     let onePercentX = window.innerWidth/100;
-    let boxCount = 5;
     let xPos = 0;
     let xOffset = 100 / boxCount;
-    let boxHeight = window.innerHeight/32;
-    let boxWidth = window.innerWidth/5;
 
     ctx.fillStyle = '#aeae93';
-    ctx.font = "28px eurocine-regular";
+    ctx.font = "1.75rem eurocine-regular";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     padding = 2;
 
     if (window.innerHeight > window.innerWidth){
-        ctx.font = "14px eurocine-regular";        
+        ctx.font = "0.625rem eurocine-regular";        
         padding = 0;
     }
 
-    for (i=0; i < boxCount;i++){            
+    for (i=0; i < boxCount;i++){   
         let x = onePercentX*xPos;
         let y = offsetY[i];
         textElements[4] = moment().format('HH:mm:ss');
         ctx.fillStyle = 'white';
-        ctx.fillRect(x, y, boxWidth, boxHeight);
+        ctx.fillRect(x, y, boxWidth, boxHeights[i]);
         
         ctx.fillStyle = 'black';        
-        ctx.fillText(textElements[i], x + boxWidth / 2 +  padding, y  + boxHeight / 2 + padding);
+        ctx.fillText(textElements[i], x + boxWidth / 2 +  padding, y  + boxHeights[i] / 2 + padding);
         xPos += xOffset;
     }
 }
 
 function spinBoxes(){
     for (i = 0; i < textElements.length; i++){ 
-        CustomEase.create("custom", "M0,0 C0.12,0.364 -0.184,1.028 0.921,0.996 0.933,0.998 0.946,1 0.958,1 0.978,1 0.942,1 1,1 ");
-        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight *10.48, ease: "custom"})
+        CustomEase.create("custom", "M0,0,C0.104,0.204,0.126,0.564,1,1")
+        if (boxHovered[i] == true){
+            TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight * 9.9, ease: "custom"})
+        }
+        TweenMax.to(tweenElement[i], tweenDuration[i], {y: window.innerHeight * 9.97, ease: "custom"})
         offsetY[i] = tweenElement[i].y - (window.innerHeight * Math.floor(tweenElement[i].y/window.innerHeight));
     }  
 }
@@ -104,38 +105,50 @@ function positionStars(radiant){
     var y = Math.sin(radiant/180*Math.PI ) * radius;
     ctx.drawImage(imgStar, window.innerWidth / 2 + x - imageSize / 2, window.innerHeight / 2 + y - yOffset, 
         imageSize, imageSize);
+}
+
+function drawWhiteOverlay(){
     
 }
 
 const imgStar = new Image(50,50);
-imgStar.src = 'assets/star.png'
+imgStar.src = 'assets/star.png';
+
+var canvas = document.querySelector('#canvas');
+var main = document.querySelector('#main');
+var spinbutton = document.querySelector('#spinbutton');
 
 var scrollClockwise = true;
 var time = 0;
 var timeOffset = 0.5
 var radiants = [0,30,60,90,120,150,180,210,240,270,300,330];
+
+var boxCount = 5;
 var textElements = ['Amir', 'Begic', 'Projects', 'Photography', String.fromCharCode(169)+"2021"];
-var clickedElements = [false, false, false, false, false]
 var initialOffset = 0;
-var tweenDuration = [3, 3.8, 4, 3.6, 3.2];
+var tweenDuration = [2, 2.8, 2.85, 2.6, 2.2];
 var offsetY = [initialOffset, initialOffset, initialOffset, initialOffset, initialOffset];
-var offsetYtween = {y: 0};
 var tweenElement = [{y:0},{y:0},{y:0},{y:0},{y:0}];
 
-var canvas = document.querySelector('#canvas');
-var main = document.querySelector('#main');
-var spinbutton = document.querySelector('#spinbutton')
+var initialBoxHeight = window.innerHeight/32;
+var boxHeights = [initialBoxHeight, initialBoxHeight, initialBoxHeight, initialBoxHeight, initialBoxHeight];
+var boxWidth = window.innerWidth/5;
+
+var boxHovered = [false,false,false,false,false]
+
+
 var pr = window.devicePixelRatio;
 canvas.style.width = window.innerWidth;
-canvas.width= Math.floor(window.innerWidth * pr) ;
-canvas.height =Math.floor(window.innerHeight * pr);
+canvas.width = Math.floor(window.innerWidth * pr);
+canvas.height = Math.floor(window.innerHeight * pr);
 canvas.style.height = window.innerHeight;
 
 if (canvas.getContext) {
     var ctx = canvas.getContext('2d');
 }
-ctx.scale(pr, pr)
-draw()
+
+ctx.scale(pr, pr);
+draw();
 
 window.addEventListener('resize', ()=>{
     canvas.style.width = window.innerWidth;
@@ -145,13 +158,33 @@ window.addEventListener('resize', ()=>{
     ctx.scale(pr, pr);
 })
 
-spinbutton.addEventListener('click', (event)=> {
+canvas.addEventListener('click', (event)=> {
+    var mousePositionX = event.clientX;
+    var partition = Math.floor(5 / window.innerWidth * mousePositionX);
+
+    boxHovered[partition] = true;
+    drawWhiteOverlay(partition);
+})
+
+canvas.addEventListener('mousemove', (event)=>{
+    boxHovered.fill(false);
+    boxHeights.fill(initialBoxHeight);
+
+    var mousePositionX = event.clientX;
+    var partition = Math.floor(5 / window.innerWidth * mousePositionX);
+
+    boxHovered[partition] = true;
+})
+
+canvas.addEventListener('mouseleave', (event)=>{
+    boxHovered.fill(false);
+})
+
+spinbutton.addEventListener('click', ()=> {
     tweenElement = [{y:0},{y:0},{y:0},{y:0},{y:0}];
-    spinBoxes();
 })
 
 window.addEventListener('wheel', (event)=>{
-
     if(event.deltaY < 0 && timeOffset > -10){
         timeOffset -= 1.5;        
     }else if (event.deltaY > 0 && timeOffset < 10){
