@@ -29,7 +29,7 @@ var siteContent = {
             "label": "Projects",
             "blocks": [
                 { "heading": "Nordklang", "link": "https://nordklang.ch", "text": "Festival and association website, running since 2020. Craft/PHP/CS/JSS" },
-                { "heading": "Zerreisprobe", "link": "https://zerreissprobe.ch", "text": "One-pager on the drama around the FCSG leadership after the 2026 cup win. Plain HTML/JS/Claude" },
+                { "heading": "Zerreissprobe", "link": "https://zerreissprobe.ch", "text": "One-pager on the drama around the FCSG leadership after the 2026 cup win. Plain HTML/JS/Claude" },
                 { "heading": "Bon Ajvar", "link": "https://bonajvar.eu", "text": "Site for my DJ project Bon Ajvar. React/Next.js/Vercel" }
             ]
         },
@@ -37,7 +37,7 @@ var siteContent = {
             "label": "Contact",
             "blocks": [
                 { "heading": "amir@begic.eu", "link": "mailto:amir@begic.eu" },
-                { "heading": "Linkedin", "link": "https://www.linkedin.com/in/amir-begi%C4%87-7003751a3/"},
+                { "heading": "LinkedIn", "link": "https://www.linkedin.com/in/amir-begi%C4%87-7003751a3/"},
                 { "heading": "GitHub", "link": "https://github.com/amir-begic/" }
              ]
         },
