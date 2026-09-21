@@ -76,12 +76,16 @@ function drawBoxes(){
             continue;
         }
 
-        ctx.fillStyle = 'white';
-        ctx.fillRect(x, y, boxWidth, boxHeights[i]);
+        // a revealing tab was already filled and outlined as one shape with the page
+        // below it, so drawing its own box here would put that divider back
+        if (!boxRevealing(i)){
+            ctx.fillStyle = 'white';
+            ctx.fillRect(x, y, boxWidth, boxHeights[i]);
 
-        ctx.strokeStyle = '#004494';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(x, y, boxWidth, boxHeights[i]);
+            ctx.strokeStyle = '#004494';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, y, boxWidth, boxHeights[i]);
+        }
 
         ctx.fillStyle = 'black';        
         ctx.fillText(textElements[i], x + boxWidth / 2 +  padding, y  + boxHeights[i] / 2 + padding);
@@ -94,30 +98,41 @@ function spinBoxes(){
             continue;
         }
 
-        let target = window.innerHeight * (boxHovered[i] ? hoverPosition : restPosition);
+        let hovered = boxHovered[i];
+        let target = window.innerHeight * (hovered ? hoverPosition : restPosition);
 
         // one tween per target change, not one per frame. re-making it every frame only
         // ever sampled the first instant of the curve, which pinned the box to full speed
         // from the off - given a whole tween the ease can wind up and then settle
         if (boxTarget[i] != target){
             let far = Math.abs(target - tweenElement[i].y) > window.innerHeight;
+            let duration = far ? tweenDuration[i] : (hovered ? liftDuration : settleDuration);
 
             boxTarget[i] = target;
             gsap.killTweensOf(tweenElement[i]);
-            TweenMax.to(tweenElement[i], far ? tweenDuration[i] : liftDuration, {y: target, ease: "spin"});
+            TweenMax.to(tweenElement[i], duration, {y: target, ease: "spin"});
         }
 
         offsetY[i] = tweenElement[i].y - (window.innerHeight * Math.floor(tweenElement[i].y/window.innerHeight));
     }  
 }
 
-// how far each box travelled since the last frame, measured before anything is drawn.
-// the sign matters: a hovered box lifts towards a lower target, so it reads negative
+// how fast each box is travelling, measured before anything is drawn. in pixels per
+// second rather than per frame - a per-frame figure means the same motion reads as fast
+// on a slow machine and slow on a quick one, which made the tests below frame rate bound
 function measureBoxSpeed(){
+    let now = performance.now() / 1000;
+    let step = Math.min(0.1, now - lastSpeedTime) || 1 / 60;
+    lastSpeedTime = now;
+
     for (i = 0; i < boxCount; i++){
-        boxVelocity[i] = tweenElement[i].y - lastTweenY[i];
-        boxSpeed[i] = Math.abs(boxVelocity[i]);
+        boxSpeed[i] = Math.abs(tweenElement[i].y - lastTweenY[i]) / step;
         lastTweenY[i] = tweenElement[i].y;
+
+        // released once it is back down on the edge and the pointer has moved on
+        if (!boxHovered[i] && window.innerHeight - (offsetY[i] + boxHeights[i]) <= 0.5){
+            boxLifted[i] = false;
+        }
     }
 }
 
@@ -140,10 +155,21 @@ function maxLift(){
 
 // the peek is the gap a lifting box leaves at the bottom edge. a box still settling
 // after a spin sits in the same place but is on its way down, so the sign rules it out
+// boxLifted stays set from the moment a tab is hovered until it has fully sunk back, so
+// the page underneath keeps showing while the tab descends. keying this off boxHovered
+// instead tore the white away the instant the pointer left, flashing blue in the gap.
+// the speed test still rules out a tab flying past the bottom edge mid-spin
 function boxRevealing(index){
+    // nothing to uncover once a panel is out: the page is already white. worse, the sheet
+    // is painted after the reveal and would bury its outline, leaving the tab with no
+    // border at all - so over an open panel a tab is drawn as an ordinary box
+    if (panel.progress > 0){
+        return false;
+    }
+
     let gap = window.innerHeight - (offsetY[index] + boxHeights[index]);
 
-    return gap > 0 && gap <= maxLift() + 1 && boxVelocity[index] <= 0.5;
+    return boxLifted[index] && gap > 0 && gap <= maxLift() + 1 && boxSpeed[index] < maxSettleSpeed;
 }
 
 function drawStars(time){
@@ -170,15 +196,23 @@ function drawWhiteOverlay(){
     ctx.strokeStyle = '#004494';
     ctx.lineWidth = 1;
 
-    // the page peeking out from under whatever the pointer is over. it carries the same
-    // outline as the box so the two read as one shape rather than a box over a gap
+    // the tab and the page it uncovers are drawn as one shape, from the top of the lifted
+    // tab down to the window edge. outlining them separately put a border across the
+    // middle of the white and split it in two
     for (i = 0; i < boxCount; i++){
-        if (boxHovered[i] && boxRevealing(i)){
+        if (boxRevealing(i)){
             let band = boxBand(i, offsetY[i], boxHeights[i]);
 
-            // square all round: the top meets the tab and the bottom is the window edge
             ctx.fillRect(band.x, band.top, band.width, band.bottom - band.top);
-            ctx.strokeRect(band.x, band.top, band.width, band.bottom - band.top);
+
+            // three sides only: no divider across the middle, and nothing along the
+            // window edge, where half the stroke would fall off screen anyway
+            ctx.beginPath();
+            ctx.moveTo(band.x, band.bottom);
+            ctx.lineTo(band.x, band.top);
+            ctx.lineTo(band.x + band.width, band.top);
+            ctx.lineTo(band.x + band.width, band.bottom);
+            ctx.stroke();
         }
     }
 
@@ -234,7 +268,7 @@ function boxBand(index, top, height){
     return {
         x: window.innerWidth * index / boxCount,
         width: boxWidth,
-        top: top + height,
+        top: top,
         bottom: window.innerHeight
     };
 }
@@ -535,7 +569,10 @@ var initialOffset = window.innerHeight * (restPosition - Math.floor(restPosition
 // content ever holds more columns than there are entries here
 var spinDurations = [2, 2.8, 2.85, 2.6, 2.2];
 var tweenDuration = tabs.map(function(tab, index){ return spinDurations[index % spinDurations.length]; });
+// quick to lift so a hover feels responsive, slow to sink back so the page underneath
+// does not snap shut the moment the pointer moves to the next tab
 var liftDuration = 0.5;
+var settleDuration = 1.4;
 
 var initialBoxHeight = window.innerHeight/32;
 var boxWidth = window.innerWidth/boxCount;
@@ -546,8 +583,13 @@ var offsetY = tabs.map(function(){ return initialOffset; });
 var tweenElement = tabs.map(function(){ return {y: restTweenY}; });
 var boxHeights = tabs.map(function(){ return initialBoxHeight; });
 var boxHovered = tabs.map(function(){ return false; });
+var boxLifted = tabs.map(function(){ return false; });
 var boxSpeed = tabs.map(function(){ return 0; });
-var boxVelocity = tabs.map(function(){ return 0; });
+var lastSpeedTime = 0;
+
+// a tab sinking back after a hover covers its lift in about half a second, so tens of
+// pixels a second. one flying past the bottom edge mid spin does thousands
+var maxSettleSpeed = 300;
 var lastTweenY = tabs.map(function(){ return restTweenY; });
 
 var panelIndex = Math.max(0, tabs.findIndex(function(tab){ return !!tab.blocks; }));
@@ -626,6 +668,7 @@ canvas.addEventListener('mousemove', (event)=>{
 
     if (panelContent[partition]){
         boxHovered[partition] = true;
+        boxLifted[partition] = true;
     }
 })
 
@@ -645,6 +688,7 @@ spinbutton.addEventListener('click', ()=> {
     // screens, rather than blinking to the top of the window first
     for (i = 0; i < boxCount; i++){
         releaseBox(i, offsetY[i], spinTravel);
+        boxLifted[i] = false;
     }
 })
 
