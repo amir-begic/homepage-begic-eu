@@ -297,6 +297,10 @@ function labelLeft(labelWidth, margin){
 function drawPanelCopy(){
     let blocks = panelContent[panelIndex];
 
+    // canvas text is just pixels, so remember where each linked line landed and test
+    // clicks against those boxes. rebuilt every frame, since the copy moves as it opens
+    linkHits = [];
+
     if (panel.progress <= 0 || dock.progress <= 0 || !blocks){
         return;
     }
@@ -322,26 +326,67 @@ function drawPanelCopy(){
     let y = m.margin + initialBoxHeight + m.lineHeight * 3;
 
     for (let b = 0; b < blocks.length; b++){
+        let link = blocks[b].link;
+
         if (blocks[b].heading){
             ctx.fillStyle = 'black';
             ctx.font = m.headingSize + "px eurocine-regular, Arial, sans-serif";
-            ctx.fillText(blocks[b].heading, m.columnX, y);
+            drawCopyLine(blocks[b].heading, m.columnX, y, m.headingSize, link);
             y += m.lineHeight;
         }
 
-        ctx.fillStyle = '#004494';
-        ctx.font = m.bodySize + "px Helvetica, Arial, sans-serif";
-        let lines = wrapText(blocks[b].text, m.columnWidth);
+        // text is optional - a block can be just a linked heading
+        if (blocks[b].text){
+            ctx.fillStyle = '#004494';
+            ctx.font = m.bodySize + "px Helvetica, Arial, sans-serif";
+            let lines = wrapText(blocks[b].text, m.columnWidth);
 
-        for (let l = 0; l < lines.length; l++){
-            ctx.fillText(lines[l], m.columnX, y);
-            y += m.lineHeight;
+            // the link marks the heading when there is one, otherwise the text itself
+            let textLink = blocks[b].heading ? null : link;
+
+            for (let l = 0; l < lines.length; l++){
+                drawCopyLine(lines[l], m.columnX, y, m.bodySize, textLink);
+                y += m.lineHeight;
+            }
         }
 
         y += m.blockGap;
     }
 
     ctx.restore();
+}
+
+// one line of copy, underlined and registered as a hit target when it carries a link
+function drawCopyLine(text, x, y, size, link){
+    ctx.fillText(text, x, y);
+
+    if (!link){
+        return;
+    }
+
+    let width = ctx.measureText(text).width;
+    let underline = y + Math.round(size * 0.18);
+
+    ctx.strokeStyle = ctx.fillStyle;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, underline);
+    ctx.lineTo(x + width, underline);
+    ctx.stroke();
+
+    linkHits.push({x: x, top: y - size, width: width, height: size * 1.35, url: link});
+}
+
+function linkAt(x, y){
+    for (let h = 0; h < linkHits.length; h++){
+        let box = linkHits[h];
+
+        if (x >= box.x && x <= box.x + box.width && y >= box.top && y <= box.top + box.height){
+            return box;
+        }
+    }
+
+    return null;
 }
 
 function drawPanelTitle(){
@@ -506,6 +551,7 @@ var boxVelocity = tabs.map(function(){ return 0; });
 var lastTweenY = tabs.map(function(){ return restTweenY; });
 
 var panelIndex = Math.max(0, tabs.findIndex(function(tab){ return !!tab.blocks; }));
+var linkHits = [];
 var panelOpen = false;
 var panel = {progress: 0};
 var dock = {progress: 0};
@@ -544,6 +590,17 @@ draw();
 window.addEventListener('resize', resizeCanvas);
 
 canvas.addEventListener('click', (event)=> {
+    var link = linkAt(event.clientX, event.clientY);
+
+    if (link){
+        if (link.url.indexOf('mailto:') == 0){
+            window.location.href = link.url;
+        }else{
+            window.open(link.url, '_blank', 'noopener');
+        }
+        return;
+    }
+
     var mousePositionX = event.clientX;
     var partition = Math.floor(boxCount / window.innerWidth * mousePositionX);
 
@@ -555,6 +612,8 @@ canvas.addEventListener('click', (event)=> {
 })
 
 canvas.addEventListener('mousemove', (event)=>{
+    canvas.style.cursor = linkAt(event.clientX, event.clientY) ? 'pointer' : 'default';
+
     boxHovered.fill(false);
     boxHeights.fill(initialBoxHeight);
 
